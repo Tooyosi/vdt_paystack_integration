@@ -6,12 +6,15 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.INTEGER(11),
       allowNull: false,
       primaryKey: true,
-      comment: "null"
+      primaryKey: true,
+      comment: "null",
+      autoIncrement: true
     },
     'username': {
       type: DataTypes.STRING(255),
       allowNull: false,
-      comment: "null"
+      comment: "null",
+      unique: true
     },
     'password': {
       type: DataTypes.STRING(255),

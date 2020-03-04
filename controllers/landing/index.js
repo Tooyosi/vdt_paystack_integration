@@ -11,6 +11,10 @@ module.exports = {
 
     post: ('/', async (req, res) => {
         let { id, amount } = req.body
+        if(id.trim() == "" || Number(amount) < 1){
+                req.flash('error', 'One or more input parameters are not valid')
+                return res.redirect('back')
+        }
         request({
             uri: `${process.env.ALEPO_GET_USER}/${id}`,
             method: "GET",
@@ -21,6 +25,8 @@ module.exports = {
         }, (error, response) => {
             if (error || !response) {
                 logger.error(error ? error : 'An error occured while fetching user details')
+                req.flash('error', error ? error : 'An error occured while fetching user details')
+                return res.redirect('back')
             } else {
                 if (response.statusCode == 200) {
                     let userDetails = JSON.parse(response.body)
@@ -35,7 +41,9 @@ module.exports = {
                     form.amount *= 100;
                     initializePayment(form, async (error, body) => {
                         if (error || !body) {
-                            return logger.error(error)
+                            logger.error(error ? error : 'An error occured while attempting payment')
+                            req.flash('error', error ? error : 'An error occured while attempting payment')
+                            return res.redirect('back')
                         } else {
                             let newResponse = JSON.parse(body)
                             if (newResponse.status) {
@@ -48,20 +56,26 @@ module.exports = {
                                         customer_phone: userDetails.phoneHome,
                                         customer_email: userDetails.email,
                                         amount: amount,
-                                        transaction_status: 'Pending',
+                                        transaction_status: 'initiated',
                                         payment_date: new Date().toISOString().slice(0, 19).replace('T', ' ')
                                     })
                                     if (newTransaction != null && newTransaction !== undefined) {
                                         return res.redirect(`${newResponse.data.authorization_url}`)
                                     } else {
                                         logger.error('Error in creating transaction')
+                                        req.flash('error', 'Error in creating transaction')
+                                        return res.redirect('back')
                                     }
 
                                 } catch (error) {
                                     logger.error(error.toString())
+                                    req.flash('error', error.toString())
+                                    return res.redirect('back')
                                 }
                             } else {
                                 logger.error(newResponse.message)
+                                req.flash('error', newResponse.message)
+                                return res.redirect('back')
                             }
                         }
                     })
@@ -76,26 +90,30 @@ module.exports = {
 
     paystack: ('/', async (req, res) => {
         const ref = req.query.reference;
+        let newTransaction = await models.Transactions.findOne({
+            where: {
+                transaction_ref: req.query.reference
+            } 
+        }) 
         verifyPayment(ref, async (error, body) => {
             if (error || !body) {
                 //handle errors appropriately
-                console.log(error)
-
+                if(newTransaction !== null && newTransaction !==undefined){
+                    newTransaction.update({
+                        transaction_status: 'indeterminate',
+                    })
+                }
+                req.flash('error', error ? error : 'An error occured while Verifying user payment')
                 return res.redirect('/')
             } else {
                 let response = JSON.parse(body);
                 if (response.status) {
-                    let newTransaction = await models.Transactions.findOne({
-                        where: {
-                            transaction_ref: req.query.reference
-                        } 
-                    }) 
                     if(newTransaction !== null && newTransaction !==undefined){
                         newTransaction.update({
                             transaction_status: response.data.status,
-
                         })
                     }
+                    req.flash('success', response.data.gateway_response)
                     return res.redirect('/')
                 }
 
