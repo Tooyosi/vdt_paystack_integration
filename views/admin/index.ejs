@@ -26,6 +26,7 @@
     <div class="table-responsive">
         <table class="table table-striped">
             <thead>
+                <th>No</th>
                 <th>Subscriber Id</th>
                 <th>Customer Name</th>
                 <th>Customer Phone</th>
@@ -37,14 +38,15 @@
                 <th>Post Amount Status</th>
             </thead>
             <tbody>
-                <% data.forEach((transaction)=>{%>
+                <% data.forEach((transaction, i)=>{%>
                 <tr>
+                    <td><%=(i + 1)%></td>
                     <td><%=transaction.subscriber_id%></td>
                     <td><%=transaction.customer_firstname%> <%=transaction.customer_lastname%></td>
                     <td><%=transaction.customer_phone%></td>
                     <td><%=transaction.customer_email%></td>
                     <td><%=transaction.transaction_ref%></td>
-                    <td><%=transaction.amount%></td>
+                    <td>&#8358; <%=transaction.amount%></td>
                     <td><%=transaction.transaction_status%></td>
                     <td><%=transaction.payment_date%></td>
                     <td><%=transaction.post_amount_status%></td>

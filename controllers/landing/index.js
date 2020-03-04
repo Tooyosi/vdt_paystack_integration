@@ -28,8 +28,9 @@ module.exports = {
                 req.flash('error', error ? error : 'An error occured while fetching user details')
                 return res.redirect('back')
             } else {
+                let userDetails = JSON.parse(response.body)
+                
                 if (response.statusCode == 200) {
-                    let userDetails = JSON.parse(response.body)
                     const form = {
                         fullName: userDetails.firstName + " " + userDetails.lastName,
                         amount: Number(amount),
@@ -79,6 +80,10 @@ module.exports = {
                             }
                         }
                     })
+                }else{
+                    logger.error(userDetails && userDetails.errorMessage? userDetails.errorMessage : 'An error occured while fetching user details')
+                    req.flash('error', userDetails && userDetails.errorMessage? userDetails.errorMessage : 'An error occured while fetching user details')
+                return res.redirect('back')
                 }
             }
         });
