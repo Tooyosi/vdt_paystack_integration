@@ -36,6 +36,7 @@
                 <th>Transaction Status</th>
                 <th>Payment Date</th>
                 <th>Post Amount Status</th>
+                <th>Alepo Payment Number</th>
             </thead>
             <tbody>
                 <% data.forEach((transaction, i)=>{%>
@@ -50,6 +51,7 @@
                     <td><%=transaction.transaction_status%></td>
                     <td><%=transaction.payment_date%></td>
                     <td><%=transaction.post_amount_status%></td>
+                    <td><%=transaction.payment_number_alepo%></td>
 
                 </tr>
                 <%})%>

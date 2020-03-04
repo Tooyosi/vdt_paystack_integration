@@ -11,9 +11,9 @@ module.exports = {
 
     post: ('/', async (req, res) => {
         let { id, amount } = req.body
-        if(id.trim() == "" || Number(amount) < 1){
-                req.flash('error', 'One or more input parameters are not valid')
-                return res.redirect('back')
+        if (id.trim() == "" || Number(amount) < 1) {
+            req.flash('error', 'One or more input parameters are not valid')
+            return res.redirect('back')
         }
         request({
             uri: `${process.env.ALEPO_GET_USER}/${id}`,
@@ -29,7 +29,7 @@ module.exports = {
                 return res.redirect('back')
             } else {
                 let userDetails = JSON.parse(response.body)
-                
+
                 if (response.statusCode == 200) {
                     const form = {
                         fullName: userDetails.firstName + " " + userDetails.lastName,
@@ -80,10 +80,10 @@ module.exports = {
                             }
                         }
                     })
-                }else{
-                    logger.error(userDetails && userDetails.errorMessage? userDetails.errorMessage : 'An error occured while fetching user details')
-                    req.flash('error', userDetails && userDetails.errorMessage? userDetails.errorMessage : 'An error occured while fetching user details')
-                return res.redirect('back')
+                } else {
+                    logger.error(userDetails && userDetails.errorMessage ? userDetails.errorMessage : 'An error occured while fetching user details')
+                    req.flash('error', userDetails && userDetails.errorMessage ? userDetails.errorMessage : 'An error occured while fetching user details')
+                    return res.redirect('back')
                 }
             }
         });
@@ -98,12 +98,12 @@ module.exports = {
         let newTransaction = await models.Transactions.findOne({
             where: {
                 transaction_ref: req.query.reference
-            } 
-        }) 
+            }
+        })
         verifyPayment(ref, async (error, body) => {
             if (error || !body) {
                 //handle errors appropriately
-                if(newTransaction !== null && newTransaction !==undefined){
+                if (newTransaction !== null && newTransaction !== undefined) {
                     newTransaction.update({
                         transaction_status: 'indeterminate',
                     })
@@ -113,13 +113,46 @@ module.exports = {
             } else {
                 let response = JSON.parse(body);
                 if (response.status) {
-                    if(newTransaction !== null && newTransaction !==undefined){
+                    if (newTransaction !== null && newTransaction !== undefined) {
                         newTransaction.update({
                             transaction_status: response.data.status,
                         })
+
+                        if (response.data.status == "success") {
+                            request({
+                                uri: `${process.env.ALEPO_POST_USER}/${newTransaction.dataValues.subscriber_id}/postamount?amount=${newTransaction.dataValues.amount}&paymentMethod=8&transactionType=Credit&cardId=xc03&paymentReceiver=chijioke`,
+                                method: "GET",
+                                auth: {
+                                    'user': process.env.ALEPO_USERNAME,
+                                    'pass': process.env.ALEPO_PASSWORD,
+                                }
+                            }, (error, alepoResponse)=>{
+                                if (error || !alepoResponse) {
+                                    logger.error(error ? error : 'An error occured while posting to Alepo')
+                                    req.flash('error', error ? error : 'An error occured while posting to Alepo')
+                                    return res.redirect('/')
+                                }else {
+                                    let newResponse = JSON.parse(alepoResponse.body)
+
+                                    if(alepoResponse.statusCode == 200){
+                                        newTransaction.update({
+                                            post_amount_status: 'success',
+                                            payment_number_alepo: newResponse.paymentNumber
+                                        })
+                                    }else{
+                                        newTransaction.update({
+                                            post_amount_status: 'failed',
+                                            failure_reason_alepo: newResponse.errorMessage
+                                        })
+                                    }
+                                }
+
+                                req.flash('success', response.data.gateway_response)
+                                return res.redirect('/')
+                                // return res.send(alepoResponse)
+                            })
+                        }
                     }
-                    req.flash('success', response.data.gateway_response)
-                    return res.redirect('/')
                 }
 
             }
