@@ -4,5 +4,6 @@ const adminController = require("../../controllers/admin/index")
 const middleware = require('../../middleware/index')
 
 router.get('/home', middleware, adminController.get)
+router.get('/download', middleware, adminController.getCsv)
 
 module.exports = router;

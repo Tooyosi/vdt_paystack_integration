@@ -24,8 +24,8 @@ module.exports = {
             }
         }, (error, response) => {
             if (error || !response) {
-                logger.error(error ? error : 'An error occured while fetching user details')
-                req.flash('error', error ? error : 'An error occured while fetching user details')
+                logger.error(error ? error.toString() : 'An error occured while fetching user details')
+                req.flash('error', error ? error.toString() : 'An error occured while fetching user details')
                 return res.redirect('back')
             } else {
                 let userDetails = JSON.parse(response.body)
