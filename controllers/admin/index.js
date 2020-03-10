@@ -1,7 +1,9 @@
 const models = require('../../connection/sequelize')
+const Op = require('sequelize').Op
 const { logger } = require('../../loggers/logger')
 const jwt = require('jsonwebtoken');
 const fs = require('fs')
+var moment = require('moment');
 const createCsvWriter = require('csv-writer').createObjectCsvWriter
 
 module.exports = {
@@ -10,7 +12,7 @@ module.exports = {
             var perPage = 20;
 
             var pageQuery = parseInt(req.query.page);
-            let { subsId, ref, email, amount, status } = req.query
+            let { subsId, ref, email, amount, status, date } = req.query
             var pageNumber = pageQuery ? pageQuery : 1;
             let whereObj = {}
             if (subsId) {
@@ -28,6 +30,12 @@ module.exports = {
             if (status) {
                 whereObj.transaction_status = status
             }
+            if(date){
+                whereObj.payment_date = {
+                    [Op.startsWith] : moment(new Date(date)).format('YYYY-MM-DD')
+                }
+
+            }
             let transactions = await models.Transactions.findAndCountAll({
                 offset: ((perPage * pageNumber) - perPage),
                 limit: perPage,
@@ -43,7 +51,8 @@ module.exports = {
                 ref: ref ? ref : false,
                 email: email ? email : false,
                 amount: amount ? amount : false,
-                status: status ? status : false
+                status: status ? status : false,
+                date: date ? date : false
             });
 
         } catch (error) {

@@ -19,12 +19,15 @@
         <div class="form-group">
             <input type="text" name="status" placeholder="status" class="form-control">
         </div>
+        <div class="form-group">
+            <input type="date" name="date" placeholder="date" class="form-control">
+        </div>
         <div class="">
             <button type="submit" class="btn btn-success">Search</button>
         </div>
     </form>
     <div class="col-lg-12">
-        <a class="btn btn-success" href="/admin/download?page=<%= Number(current)%><%if(subsId){%>&subsId=<%=subsId%><%}%><%if(ref){%>&ref=<%=ref%><%}%><%if(email){%>&email=<%=email%><%}%><%if(amount){%>&amount=<%=amount%><%}%><%if(status){%>&status=<%=status%><%}%>">Export</a>
+        <a class="btn btn-success" href="/admin/download?page=<%= Number(current)%><%if(subsId){%>&subsId=<%=subsId%><%}%><%if(ref){%>&ref=<%=ref%><%}%><%if(email){%>&email=<%=email%><%}%><%if(amount){%>&amount=<%=amount%><%}%><%if(status){%>&status=<%=status%><%}%><%if(date){%>&date=<%=date%><%}%>">Export</a>
     </div>
     <div class="table-responsive">
         <table class="table table-striped">
@@ -68,7 +71,7 @@
         <%if (current == 1){%>
         <li class="page-item disabled"><a class="page-link">«</a></li>
         <%} else { %>
-        <li class="page-item"><a class="page-link" href="/admin/home?page=<%= Number(current) - 1%><%if(subsId){%>&subsId=<%=subsId%><%}%><%if(ref){%>&ref=<%=ref%><%}%><%if(email){%>&email=<%=email%><%}%><%if(amount){%>&amount=<%=amount%><%}%><%if(status){%>&status=<%=status%><%}%>">First</a></li>
+        <li class="page-item"><a class="page-link" href="/admin/home?page=<%= Number(current) - 1%><%if(subsId){%>&subsId=<%=subsId%><%}%><%if(ref){%>&ref=<%=ref%><%}%><%if(email){%>&email=<%=email%><%}%><%if(amount){%>&amount=<%=amount%><%}%><%if(status){%>&status=<%=status%><%}%><%if(date){%>&date=<%=date%><%}%>">First</a></li>
             <%}%>
             <% var i = (Number(current) > 5 ? Number(current) - 4 : 1) %>
             <% if (i !== 1) { %>
@@ -78,7 +81,7 @@
         <% if (i == current) { %>
         <li class="active page-item"><a class="page-link"><%= i %></a></li>
         <% } else { %>
-        <li class="page-item"><a class="page-link" href="/admin/home?page=<%= i %><%if(subsId){%>&&subsId=<%=subsId%><%}%><%if(ref){%>&&ref=<%=ref%><%}%><%if(email){%>&&email=<%=email%><%}%><%if(amount){%>&&amount=<%=amount%><%}%><%if(status){%>&&status=<%=status%><%}%>"><%= i %></a></li>
+        <li class="page-item"><a class="page-link" href="/admin/home?page=<%= i %><%if(subsId){%>&&subsId=<%=subsId%><%}%><%if(ref){%>&&ref=<%=ref%><%}%><%if(email){%>&&email=<%=email%><%}%><%if(amount){%>&&amount=<%=amount%><%}%><%if(status){%>&&status=<%=status%><%}%><%if(date){%>&date=<%=date%><%}%>"><%= i %></a></li>
             <% } %>
             <% if (i == Number(current) + 4 && i < pages) { %>
             <li class=" disabled page-item"><a class="page-link">...</a></li>
@@ -88,13 +91,13 @@
         <% if (current == pages) { %>
         <li class="disabled page-item"><a class="page-link">»</a></li>
         <% } else { %>
-        <li class="page-item"><a class="page-link" href="/admin/home?page=<%= Number(current) + 1 %><%if(subsId){%>&subsId=<%=subsId%><%}%><%if(ref){%>&ref=<%=ref%><%}%><%if(email){%>&email=<%=email%><%}%><%if(amount){%>&amount=<%=amount%><%}%><%if(status){%>&status=<%=status%><%}%>">»</a></li>
+        <li class="page-item"><a class="page-link" href="/admin/home?page=<%= Number(current) + 1 %><%if(subsId){%>&subsId=<%=subsId%><%}%><%if(ref){%>&ref=<%=ref%><%}%><%if(email){%>&email=<%=email%><%}%><%if(amount){%>&amount=<%=amount%><%}%><%if(status){%>&status=<%=status%><%}%><%if(date){%>&date=<%=date%><%}%>">»</a></li>
             <% } %>
             
             <% if (current == pages) { %>
             <li class=" disabled page-item"><a class="page-link">Last</a></li>
         <% } else { %>
-        <li class="page-item"><a class="page-link" href="/admin/home?page=<%= pages %><%if(subsId){%>&subsId=<%=subsId%><%}%><%if(ref){%>&ref=<%=ref%><%}%><%if(email){%>&email=<%=email%><%}%><%if(amount){%>&amount=<%=amount%><%}%><%if(status){%>&status=<%=status%><%}%>">Last</a></li>
+        <li class="page-item"><a class="page-link" href="/admin/home?page=<%= pages %><%if(subsId){%>&subsId=<%=subsId%><%}%><%if(ref){%>&ref=<%=ref%><%}%><%if(email){%>&email=<%=email%><%}%><%if(amount){%>&amount=<%=amount%><%}%><%if(status){%>&status=<%=status%><%}%><%if(date){%>&date=<%=date%><%}%>">Last</a></li>
             <% } %>
         </ul>
         <% } %>
